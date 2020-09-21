@@ -24,6 +24,12 @@ public class CameraController : MonoBehaviour
         topRightLimit = theMap.localBounds.max - new Vector3(halfWidth, halfHeight, 0);
 
         PlayerController.instance.SetBounds(theMap.localBounds.min, theMap.localBounds.max);
+
+        Debug.Log("MoveTo: " + PlayerController.instance.moveTo);
+        if (PlayerController.instance.moveTo != Vector3.zero) {
+            Debug.Log("Allowing to move");
+            PlayerController.instance.moveToEnabled = true;
+        }
     }
 
     void LateUpdate()

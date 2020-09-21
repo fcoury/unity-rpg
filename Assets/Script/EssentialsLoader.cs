@@ -19,6 +19,7 @@ public class EssentialsLoader : MonoBehaviour
         {
             PlayerController clone = Instantiate(player).GetComponent<PlayerController>();
             PlayerController.instance = clone;
+            PlayerController.instance.moveTo = GameObject.Find("Area Entrance").gameObject.transform.position;
         }
 
         if (GameManager.instance == null)

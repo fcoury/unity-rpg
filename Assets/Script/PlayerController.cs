@@ -10,11 +10,14 @@ public class PlayerController : MonoBehaviour
 
     private Vector3 bottomLeftLimit;
     private Vector3 topRightLimit;
+    public Vector3 moveTo = Vector3.zero;
+    public bool moveToEnabled;
 
     public bool canMove = true;
 
     void Start()
     {
+        Debug.Log("Position: " + gameObject.transform.position);
         if (instance == null)
         {
             instance = this;
@@ -31,6 +34,15 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+        if (moveToEnabled) {
+            Debug.Log(instance + " - " + this + " - Position: " + transform.position + " Move to: " + moveTo);
+            transform.position = moveTo;
+            Debug.Log("B:" + transform.position.x + " / " + Mathf.Clamp(transform.position.x, bottomLeftLimit.x, topRightLimit.x));
+            moveToEnabled = false;
+            moveTo = Vector3.zero;
+            return;
+        }
+
         float horizMove = Input.GetAxisRaw("Horizontal");
         float vertMove = Input.GetAxisRaw("Vertical");
 
@@ -56,6 +68,12 @@ public class PlayerController : MonoBehaviour
         }
 
         transform.position = new Vector3(Mathf.Clamp(transform.position.x, bottomLeftLimit.x, topRightLimit.x), Mathf.Clamp(transform.position.y, bottomLeftLimit.y, topRightLimit.y), transform.position.z);
+    }
+
+    public void MoveTo(Vector3 destination)
+    {
+        moveTo = destination;
+        moveToEnabled = true;
     }
 
     public void SetBounds(Vector3 botLeft, Vector3 topRight)
