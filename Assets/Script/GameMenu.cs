@@ -15,13 +15,20 @@ public class GameMenu : MonoBehaviour
     public Image[] charImage;
     public GameObject[] charStatHolder;
 
-    // Start is called before the first frame update
+    public ItemButton[] itemButtons;
+    public string selectedItem;
+    public Item activeItem;
+    public Text itemName;
+    public Text itemDescription;
+    public Text useButtonText;
+
+    public static GameMenu instance;
+
     void Start()
     {
-
+        instance = this;
     }
 
-    // Update is called once per frame
     void Update()
     {
         if (Input.GetButtonDown("Fire2"))
@@ -88,5 +95,32 @@ public class GameMenu : MonoBehaviour
 
         theMenu.SetActive(false);
         GameManager.instance.gameMenuOpen = false;
+    }
+
+    public void ShowPlayerStats()
+    {
+        PlayerStatsWindow.instance.ShowPlayerStats(0);
+    }
+
+    public void ShowItems()
+    {
+        GameManager.instance.SortItems();
+
+        for (int i = 0; i < itemButtons.Length; i++)
+        {
+            itemButtons[i].buttonValue = i;
+
+            if (GameManager.instance.itemsHeld[i] == "")
+            {
+                itemButtons[i].buttonImage.gameObject.SetActive(false);
+                itemButtons[i].amountText.text = "";
+            }
+            else
+            {
+                itemButtons[i].buttonImage.gameObject.SetActive(true);
+                itemButtons[i].buttonImage.sprite = GameManager.instance.GetItemDetails(GameManager.instance.itemsHeld[i]).itemSprite;
+                itemButtons[i].amountText.text = GameManager.instance.numberOfItems[i].ToString();
+            }
+        }
     }
 }
