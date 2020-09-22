@@ -9,16 +9,6 @@ public class ItemButton : MonoBehaviour
     public Text amountText;
     public int buttonValue;
 
-    void Start()
-    {
-
-    }
-
-    void Update()
-    {
-
-    }
-
     public void Press()
     {
         if (GameMenu.instance.theMenu.activeInHierarchy)
@@ -41,6 +31,11 @@ public class ItemButton : MonoBehaviour
             {
                 Shop.instance.SelectSellItem(GameManager.instance.GetItemDetails(GameManager.instance.itemsHeld[buttonValue]));
             }
+        }
+
+        if (BattleManager.instance.itemsMenu.activeInHierarchy)
+        {
+            BattleManager.instance.SelectItem(GameManager.instance.GetItemDetails(GameManager.instance.itemsHeld[buttonValue]));
         }
     }
 }

@@ -23,16 +23,6 @@ public class Item : MonoBehaviour
     public int weaponStrength;
     public int armorStrength;
 
-    void Start()
-    {
-
-    }
-
-    void Update()
-    {
-
-    }
-
     public void Use(int charToUseOn)
     {
         CharStats selectedChar = GameManager.instance.playerStats[charToUseOn];

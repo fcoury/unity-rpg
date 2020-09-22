@@ -29,6 +29,18 @@ public class BattleManager : MonoBehaviour
 
     public GameObject targetMenu;
     public BattleTargetButton[] targetButtons;
+    public GameObject magicMenu;
+    public BattleMagicSelect[] magicButtons;
+
+    public BattleNotification battleNotice;
+
+    public GameObject itemsMenu;
+    public ItemButton[] itemButtons;
+    public Item itemToUse;
+    public Text itemName;
+    public Text itemDescription;
+
+    public int chanceToFlee = 35;
 
     void Start()
     {
@@ -327,6 +339,114 @@ public class BattleManager : MonoBehaviour
             {
                 targetButtons[i].gameObject.SetActive(false);
             }
+        }
+    }
+
+    public void OpenMagicMenu()
+    {
+        magicMenu.SetActive(true);
+
+        for (int i = 0; i < magicButtons.Length; i++)
+        {
+            if (activeBattlers[currentTurn].movesAvailable.Length > i)
+            {
+                magicButtons[i].gameObject.SetActive(true);
+                magicButtons[i].spellName = activeBattlers[currentTurn].movesAvailable[i];
+                magicButtons[i].nameText.text = activeBattlers[currentTurn].movesAvailable[i];
+
+                for (int j = 0; j < movesList.Length; j++)
+                {
+                    if (movesList[j].moveName == magicButtons[i].spellName)
+                    {
+                        magicButtons[i].spellCost = movesList[j].moveCost;
+                        magicButtons[i].costText.text = magicButtons[i].spellCost.ToString();
+                    }
+                }
+            }
+            else
+            {
+                magicButtons[i].gameObject.SetActive(false);
+            }
+        }
+    }
+
+    public void OpenItemsMenu()
+    {
+        BattleChar player = activeBattlers[currentTurn];
+
+        if (!player.isPlayer) {
+            return;
+        }
+
+        for (int i = 0; i < itemButtons.Length; i++)
+        {
+            itemButtons[i].buttonValue = i;
+
+            if (i < GameManager.instance.itemsHeld[i].Length)
+            {
+                itemButtons[i].buttonImage.gameObject.SetActive(true);
+                itemButtons[i].buttonImage.sprite = GameManager.instance.GetItemDetails(GameManager.instance.itemsHeld[i]).itemSprite;
+                itemButtons[i].amountText.text = GameManager.instance.numberOfItems[i].ToString();
+            }
+            else
+            {
+                itemButtons[i].buttonImage.gameObject.SetActive(false);
+                itemButtons[i].amountText.text = "";
+            }
+        }
+        itemsMenu.SetActive(true);
+    }
+
+    public void SelectItem(Item selectedItem)
+    {
+        itemToUse = selectedItem;
+        itemName.text = itemToUse.itemName;
+        itemDescription.text = itemToUse.description;
+    }
+
+    public void UseItem()
+    {
+        Debug.Log("Use item " + itemToUse);
+        int charToUseOn = -1;
+        CharStats[] playerStats = GameManager.instance.playerStats;
+        BattleChar player = activeBattlers[currentTurn];
+
+        for (int i = 0; i < playerStats.Length; i++)
+        {
+            if (playerStats[i].charName == player.charName)
+            {
+                charToUseOn = i;
+                break;
+            }
+        }
+
+        Debug.Log("Use item " + itemToUse + " -> " + charToUseOn);
+        itemToUse.Use(charToUseOn);
+        CloseItemsMenu();
+
+        NextTurn();
+        battleNotice.theText.text = player.charName + " used " + itemToUse.itemName + "!";
+        battleNotice.Activate();
+    }
+
+    public void CloseItemsMenu()
+    {
+        itemsMenu.SetActive(false);
+    }
+
+    public void Flee()
+    {
+        int fleeSuccess = Random.Range(0, 100);
+        if (fleeSuccess < chanceToFlee)
+        {
+            battleActive = false;
+            battleScene.SetActive(false);
+        }
+        else
+        {
+            NextTurn();
+            battleNotice.theText.text = "Couldn't escape!";
+            battleNotice.Activate();
         }
     }
 }
