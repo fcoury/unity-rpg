@@ -8,11 +8,15 @@ public class DialogActivator : MonoBehaviour
 
     private bool canActivate;
     public bool isPerson = true;
+    public bool shouldActivateQuest;
+    public string questToMark;
+    public bool markComplete;
 
     void Update()
     {
         if (canActivate && Input.GetButtonDown("Fire1") && !DialogManager.instance.dialogBox.activeInHierarchy)
         {
+            DialogManager.instance.ShouldActivateQuestAtEnd(questToMark, markComplete);
             DialogManager.instance.ShowDialog(lines, isPerson);
         }
     }

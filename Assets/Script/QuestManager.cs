@@ -22,6 +22,16 @@ public class QuestManager : MonoBehaviour
             Debug.Log("Marking Complete");
             MarkQuestComplete("Quest Test");
         }
+
+        if (Input.GetKeyDown(KeyCode.O))
+        {
+            SaveQuestData();
+        }
+
+        if (Input.GetKeyDown(KeyCode.P))
+        {
+            LoadQuestData();
+        }
     }
 
     public int GetQuestNumber(string questName)
@@ -57,6 +67,23 @@ public class QuestManager : MonoBehaviour
         for (int i = 0; i < questObjects.Length; i++)
         {
             questObjects[i].CheckCompletion();
+        }
+    }
+
+    public void SaveQuestData()
+    {
+        for (int i = 0; i < questMarkerNames.Length; i++)
+        {
+            PlayerPrefs.SetInt("QuestMarker_" + questMarkerNames[i], questMarkersComplete[i] ? 1 : 0);
+        }
+    }
+
+    public void LoadQuestData()
+    {
+        for (int i = 0; i < questMarkerNames.Length; i++)
+        {
+            string key = "QuestMarker_" + questMarkerNames[i];
+            questMarkersComplete[i] = PlayerPrefs.HasKey(key) && PlayerPrefs.GetInt(key) == 1;
         }
     }
 }

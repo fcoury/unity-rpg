@@ -7,9 +7,14 @@ public class EssentialsLoader : MonoBehaviour
     public GameObject UIScreen;
     public GameObject player;
     public GameObject gameMan;
+    public GameObject audioMan;
 
     void Start()
     {
+        if (DialogManager.instance == null) {
+            DialogManager.instance = Instantiate(UIScreen.GetComponent<DialogManager>());
+        }
+
         if (UIFade.instance == null)
         {
             UIFade.instance = Instantiate(UIScreen).GetComponent<UIFade>();
@@ -25,6 +30,11 @@ public class EssentialsLoader : MonoBehaviour
         if (GameManager.instance == null)
         {
             Instantiate(gameMan);
+        }
+
+        if (AudioManager.instance == null)
+        {
+            Instantiate(audioMan);
         }
     }
 
