@@ -49,3 +49,5 @@ MonoBehaviour:
   gameMan: {fileID: 3460590290795612374, guid: 80b1406bf99091d42b4418c54502893e, type: 3}
   audioMan: {fileID: 6876942142977950186, guid: 5fd28a3dfae92754c998c3c0030e4b73,
     type: 3}
+  battleMan: {fileID: 4708352829503008959, guid: 24f7ac1c06f1fbf41b4af8140527fea1,
+    type: 3}

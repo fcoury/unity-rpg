@@ -8,6 +8,7 @@ public class EssentialsLoader : MonoBehaviour
     public GameObject player;
     public GameObject gameMan;
     public GameObject audioMan;
+    public GameObject battleMan;
 
     void Start()
     {
@@ -35,6 +36,13 @@ public class EssentialsLoader : MonoBehaviour
         if (AudioManager.instance == null)
         {
             Instantiate(audioMan);
+        }
+
+        Debug.Log("BattleManager " + BattleManager.instance);
+        if (BattleManager.instance == null)
+        {
+            Instantiate(battleMan);
+            Debug.Log("BattleManager " + BattleManager.instance);
         }
     }
 

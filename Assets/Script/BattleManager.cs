@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class BattleManager : MonoBehaviour
 {
@@ -11,8 +12,6 @@ public class BattleManager : MonoBehaviour
     public Transform[] enemyPositions;
     public BattleChar[] playerPrefabs;
     public BattleChar[] enemyPrefabs;
-
-    public static BattleManager instance;
 
     public GameObject uiButtonsHolder;
 
@@ -40,10 +39,20 @@ public class BattleManager : MonoBehaviour
     public Text itemName;
     public Text itemDescription;
 
+    private bool fleeing;
     public int chanceToFlee = 35;
+
+    public string gameOverScene;
+
+    public int rewardXP;
+    public string[] rewardItems;
+    public bool cannotFlee;
+
+    public static BattleManager instance;
 
     void Start()
     {
+        Debug.Log("RewardXP: " + rewardXP + " Reward Items: " + rewardItems);
         instance = this;
         DontDestroyOnLoad(gameObject);
     }
@@ -53,7 +62,7 @@ public class BattleManager : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.T))
         {
-            BattleStart(new string[] { "Eyeball", "Spider", "Skeleton" });
+            BattleStart(new string[] { "Eyeball" }, false);
         }
 
         if (battleActive)
@@ -78,10 +87,11 @@ public class BattleManager : MonoBehaviour
         }
     }
 
-    public void BattleStart(string[] enemiesToSpawn)
+    public void BattleStart(string[] enemiesToSpawn, bool setCannotFlee)
     {
         if (!battleActive)
         {
+            cannotFlee = setCannotFlee;
             battleActive = true;
             GameManager.instance.battleActive = true;
             transform.position = new Vector3(Camera.main.transform.position.x, Camera.main.transform.position.y, transform.position.z);
@@ -192,15 +202,17 @@ public class BattleManager : MonoBehaviour
             if (allEnemiesDead)
             {
                 // end battle in victory
+                StartCoroutine(EndBattleCo());
             }
             else
             {
                 // end in failure
+                StartCoroutine(GameOverCo());
             }
 
-            battleScene.SetActive(false);
-            GameManager.instance.battleActive = false;
-            battleActive = false;
+            // battleScene.SetActive(false);
+            // GameManager.instance.battleActive = false;
+            // battleActive = false;
         }
         else
         {
@@ -446,17 +458,90 @@ public class BattleManager : MonoBehaviour
 
     public void Flee()
     {
-        int fleeSuccess = Random.Range(0, 100);
-        if (fleeSuccess < chanceToFlee)
+        if (cannotFlee)
         {
-            battleActive = false;
-            battleScene.SetActive(false);
+            battleNotice.theText.text = "Cannot flee this battle!";
+            battleNotice.Activate();
         }
         else
         {
-            NextTurn();
-            battleNotice.theText.text = "Couldn't escape!";
-            battleNotice.Activate();
+            int fleeSuccess = Random.Range(0, 100);
+            if (fleeSuccess < chanceToFlee)
+            {
+                // battleActive = false;
+                // battleScene.SetActive(false);
+                fleeing = true;
+                StartCoroutine(EndBattleCo());
+            }
+            else
+            {
+                NextTurn();
+                battleNotice.theText.text = "Couldn't escape!";
+                battleNotice.Activate();
+            }
         }
+    }
+
+    public IEnumerator EndBattleCo()
+    {
+        battleActive = false;
+        uiButtonsHolder.SetActive(false);
+        targetMenu.SetActive(false);
+        magicMenu.SetActive(false);
+        itemsMenu.SetActive(false);
+
+        yield return new WaitForSeconds(.5f);
+
+        UIFade.instance.FadeToBlack();
+
+        yield return new WaitForSeconds(1.5f);
+
+        for (int i = 0; i < activeBattlers.Count; i++)
+        {
+            BattleChar battler = activeBattlers[i];
+
+            if (battler.isPlayer)
+            {
+                for (int j = 0; j < GameManager.instance.playerStats.Length; j++)
+                {
+                    CharStats playerStats = GameManager.instance.playerStats[j];
+                    if (battler.charName == playerStats.charName)
+                    {
+                        playerStats.currentHP = battler.currentHP;
+                        playerStats.currentMP = battler.currentMP;
+                    }
+                }
+            }
+
+            Destroy(battler.gameObject);
+        }
+
+        UIFade.instance.FadeFromBlack();
+        battleScene.SetActive(false);
+        activeBattlers.Clear();
+        currentTurn = 0;
+        if (fleeing)
+        {
+            GameManager.instance.battleActive = false;
+            fleeing = false;
+        }
+        else
+        {
+            Debug.Log("RewardXP: " + rewardXP + " Reward Items: " + rewardItems);
+            BattleReward.instance.OpenRewardScreen(rewardXP, rewardItems);
+        }
+
+        AudioManager.instance.PlayBGM(FindObjectOfType<CameraController>().musicToPlay);
+    }
+
+    public IEnumerator GameOverCo()
+    {
+        battleActive = false;
+        GameManager.instance.battleActive = false;
+        UIFade.instance.FadeToBlack();
+        yield return new WaitForSeconds(1.5f);
+
+        battleScene.SetActive(false);
+        SceneManager.LoadScene(gameOverScene);
     }
 }
