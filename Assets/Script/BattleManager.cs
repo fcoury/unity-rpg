@@ -153,7 +153,7 @@ public class BattleManager : MonoBehaviour
 
         for (int i = 0; i < activeBattlers.Count; i++)
         {
-            // Debug.Log("S - Battler: " + activeBattlers[i] + " " + activeBattlers[i].currentHP + " Enemies Dead: " + allEnemiesDead + " Players Dead: " + allPlayersDead);
+            Debug.Log("S - Battler: " + activeBattlers[i] + " " + activeBattlers[i].currentHP + " Enemies Dead: " + allEnemiesDead + " Players Dead: " + allPlayersDead);
 
             if (activeBattlers[i].currentHP < 0)
             {
@@ -162,13 +162,17 @@ public class BattleManager : MonoBehaviour
 
             if (activeBattlers[i].currentHP == 0)
             {
-
+                 if (activeBattlers[i].isPlayer)
+                 {
+                     activeBattlers[i].theSprite.sprite = activeBattlers[i].deadSprite;
+                 }
             }
             else
             {
                 if (activeBattlers[i].isPlayer)
                 {
                     allPlayersDead = false;
+                    activeBattlers[i].theSprite.sprite = activeBattlers[i].aliveSprite;
                 }
                 else
                 {
@@ -176,7 +180,7 @@ public class BattleManager : MonoBehaviour
                 }
             }
 
-            // Debug.Log("E - Battler: " + activeBattlers[i] + " " + activeBattlers[i].currentHP + " Enemies Dead: " + allEnemiesDead + " Players Dead: " + allPlayersDead);
+            Debug.Log("E - Battler: " + activeBattlers[i] + " " + activeBattlers[i].currentHP + " Enemies Dead: " + allEnemiesDead + " Players Dead: " + allPlayersDead);
         }
 
         if (allEnemiesDead || allPlayersDead)
@@ -227,7 +231,9 @@ public class BattleManager : MonoBehaviour
             }
         }
 
-        int selectedTarget = players[Random.Range(0, players.Count)];
+        int selectedIndex = Random.Range(0, players.Count);
+        Debug.Log("EnemyAttack - Selected Target " + selectedIndex + " Count:" + players.Count);
+        int selectedTarget = players[selectedIndex];
         // activeBattlers[selectedTarget].currentHP -= 30;
         int selectAttack = Random.Range(0, activeBattlers[currentTurn].movesAvailable.Length);
         int movePower = 0;
