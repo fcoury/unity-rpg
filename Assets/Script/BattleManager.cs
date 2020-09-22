@@ -166,6 +166,10 @@ public class BattleManager : MonoBehaviour
                  {
                      activeBattlers[i].theSprite.sprite = activeBattlers[i].deadSprite;
                  }
+                 else
+                 {
+                    activeBattlers[i].EnemyFade();
+                 }
             }
             else
             {
@@ -325,7 +329,7 @@ public class BattleManager : MonoBehaviour
         List<int> enemies = new List<int>();
         for (int i = 0; i < activeBattlers.Count; i++)
         {
-            if (!activeBattlers[i].isPlayer)
+            if (!activeBattlers[i].isPlayer && activeBattlers[i].currentHP > 0)
             {
                 enemies.Add(i);
             }
